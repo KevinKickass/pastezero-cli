@@ -1,0 +1,64 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # Triggert bei z. B. v0.1.0
+
+permissions:
+  contents: write  # notwendig für Upload zu Releases
+
+jobs:
+  build:
+    name: Build and Release Binaries
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        goos: [linux, darwin, windows]
+        goarch: [amd64, arm64]
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Build Binary
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+        run: |
+          mkdir -p build
+          EXT=""
+          [ "$GOOS" = "windows" ] && EXT=".exe"
+          OUT="build/pastezero-${GOOS}-${GOARCH}${EXT}"
+          go build -ldflags "-X main.version=${GITHUB_REF_NAME} -X main.buildTime=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            -o "$OUT" main.go
+
+      - name: Package
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+        run: |
+          NAME="pastezero-${GITHUB_REF_NAME}-${GOOS}-${GOARCH}"
+          mkdir -p release/$NAME
+          EXT=""
+          [ "$GOOS" = "windows" ] && EXT=".exe"
+          cp build/pastezero-${GOOS}-${GOARCH}${EXT} release/$NAME/pastezero${EXT}
+
+          cd release
+          if [ "$GOOS" = "windows" ]; then
+            zip -r "${NAME}.zip" "$NAME"
+          else
+            tar -czf "${NAME}.tar.gz" "$NAME"
+          fi
+
+      - name: Upload Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/*.zip
+          token: ${{ secrets.GITHUB_TOKEN }}
