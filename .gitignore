@@ -1,0 +1,33 @@
+# Binaries
+/pastezero
+*.exe
+*.out
+
+# Build-Ausgaben
+/build/
+/release/
+/scripts/*.log
+
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*.bak
+
+# Testdaten
+*.test.*
+*.tmp
+*.log
+
+# OS-spezifisch
+.DS_Store
+Thumbs.db
+
+# Go-Module (nur falls vendor verwendet würde)
+vendor/
+
+# GitHub CLI
+.gh/
+
+# Sicherung
+*.old
