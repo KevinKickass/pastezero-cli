@@ -10,55 +10,59 @@ permissions:
 
 jobs:
   build:
-    name: Build and Release Binaries
-    runs-on: ubuntu-latest
-
     strategy:
       matrix:
         goos: [linux, darwin, windows]
         goarch: [amd64, arm64]
-
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.set_version.outputs.version }}
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
         with:
           go-version: '1.22'
 
-      - name: Build Binary
+      - name: Set Version
+        id: set_version
+        run: echo "version=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Build
         env:
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
         run: |
-          mkdir -p build
           EXT=""
           [ "$GOOS" = "windows" ] && EXT=".exe"
-          OUT="build/pastezero-${GOOS}-${GOARCH}${EXT}"
-          go build -ldflags "-X main.version=${GITHUB_REF_NAME} -X main.buildTime=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-            -o "$OUT" main.go
-
-      - name: Package
-        env:
-          GOOS: ${{ matrix.goos }}
-          GOARCH: ${{ matrix.goarch }}
-        run: |
-          NAME="pastezero-${GITHUB_REF_NAME}-${GOOS}-${GOARCH}"
-          mkdir -p release/$NAME
-          EXT=""
-          [ "$GOOS" = "windows" ] && EXT=".exe"
-          cp build/pastezero-${GOOS}-${GOARCH}${EXT} release/$NAME/pastezero${EXT}
-
-          cd release
+          BIN_NAME=pastezero${EXT}
+          OUT_DIR=pastezero-${{ steps.set_version.outputs.version }}-${GOOS}-${GOARCH}
+          mkdir -p $OUT_DIR
+          go build -ldflags "-X main.version=${{ steps.set_version.outputs.version }}" -o $OUT_DIR/$BIN_NAME main.go
+          cd $OUT_DIR
           if [ "$GOOS" = "windows" ]; then
-            zip -r "${NAME}.zip" "$NAME"
+            zip -r ../$OUT_DIR.zip .
           else
-            tar -czf "${NAME}.tar.gz" "$NAME"
+            tar -czf ../$OUT_DIR.tar.gz .
           fi
 
-      - name: Upload Release
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.goos }}-${{ matrix.goarch }}
+          path: |
+            *.zip
+            *.tar.gz
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Upload GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: release/*
+          files: artifacts/**/*.*
           token: ${{ secrets.GITHUB_TOKEN }}
