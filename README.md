@@ -1,17 +1,22 @@
 # PasteZero CLI
 
-Command-Line-Tool für sicheren Datei-Upload und -Download mit [PasteZero.de](https://pastezero.de)  
-Ende-zu-Ende-Verschlüsselung (E2EE) im Zero-Trust-Modell – vollständig clientseitig.
+[![Release Build](https://github.com/KevinKickass/pastezero-cli/actions/workflows/release.yml/badge.svg)](https://github.com/KevinKickass/pastezero-cli/actions)
+[![Latest Release](https://img.shields.io/github/v/release/KevinKickass/pastezero-cli?sort=semver)](https://github.com/KevinKickass/pastezero-cli/releases)
+
+
+Kommandozeilentool für sicheren Datei-Upload und -Download mit [PasteZero.de](https://pastezero.de).
+Ende-zu-Ende verschlüsselt, zero-trust, plattformübergreifend.
 
 ---
 
-## Features
+## Funktionen
 
-- Upload beliebiger Dateien mit starker AES-256-GCM-Verschlüsselung
-- Download verschlüsselter Dateien über UUID + Key
-- Automatische Client-ID-Registrierung beim ersten Start
-- Volle Kompatibilität zur Web-Oberfläche (https://pastezero.de)
-- Plattformübergreifende Binaries (Linux, macOS, Windows)
+* AES-256-GCM-Verschlüsselung (E2EE)
+* Datei-Upload mit zufälligem Einmal-Schlüssel
+* Datei-Download per UUID und Key
+* Kompatibel mit der Weboberfläche
+* Plattformübergreifende Binaries (Linux, macOS, Windows)
+* Automatischer GitHub Release bei Tag
 
 ---
 
@@ -19,71 +24,86 @@ Ende-zu-Ende-Verschlüsselung (E2EE) im Zero-Trust-Modell – vollständig clien
 
 ### Vorgefertigte Binaries
 
-Lade dein Binary von GitHub Releases herunter:
+Siehe [Releases](https://github.com/KevinKickass/pastezero-cli/releases):
 
 ```bash
-curl -LO https://github.com/KevinKickass/pastezero-cli/releases/download/v0.1.0/pastezero-v0.1.0-linux-amd64.tar.gz
-tar -xzf pastezero-v0.1.0-linux-amd64.tar.gz
+curl -LO https://github.com/KevinKickass/pastezero-cli/releases/download/v0.1.1/pastezero-v0.1.1-linux-amd64.tar.gz
+tar -xzf pastezero-v0.1.1-linux-amd64.tar.gz
 chmod +x pastezero
 ./pastezero --help
-Selbst kompilieren
-bash
-Kopieren
-Bearbeiten
-git clone https://github.com/KevinKickass/pastezero-cli
+```
+
+### Selbst bauen
+
+```bash
+git clone git@github.com:KevinKickass/pastezero-cli.git
 cd pastezero-cli
 go build -o pastezero main.go
-Nutzung
-Upload
-bash
-Kopieren
-Bearbeiten
+```
+
+---
+
+## Nutzung
+
+### Upload
+
+```bash
 pastezero upload --file geheim.pdf
-→ Gibt einen Download-Link wie
+```
+
+→ Gibt dir einen Link wie:
+
+```
 https://pastezero.de/get/<uuid>#<base64-key>
-Dieser Link ist alles, was der Empfänger benötigt.
+```
 
-Download
-bash
-Kopieren
-Bearbeiten
+### Download
+
+```bash
 pastezero download https://pastezero.de/get/abc123#BASE64KEY
-Alternativ:
+```
 
-bash
-Kopieren
-Bearbeiten
-pastezero download abc123 --key BASE64KEY
-Oder interaktiv:
+Oder:
 
-bash
-Kopieren
-Bearbeiten
-pastezero download https://pastezero.de/get/abc123
-# → CLI fragt nach dem Key
-Mit Zielpfad:
+```bash
+pastezero download --id abc123 --key BASE64KEY
+```
 
-bash
-Kopieren
-Bearbeiten
-pastezero download abc123#BASE64KEY --output /tmp/zieldatei.txt
-Build
-bash
-Kopieren
-Bearbeiten
-./scripts/build.sh       # erstellt Binaries + .tar.gz/.zip in ./release/
-./scripts/release.sh     # (optional) GitHub Release hochladen (setzt Tag voraus)
-Sicherheit
-AES-256-GCM, 12-Byte IV, 32-Byte Schlüssel
+Optionaler Zielpfad:
 
-Symmetrische One-Time-Keys pro Upload
+```bash
+pastezero download abc123#KEY --output /tmp/zieldatei.txt
+```
 
-Dateiname und MIME-Type verschlüsselt eingebettet
+---
 
-Keine Passwörter, kein Backend-Zugriff auf Inhalte
+## Build lokal
 
-Kompatibel mit Browser-Client
+```bash
+./scripts/build.sh       # erstellt ./build/ + ./release/
+```
 
-Lizenz
-MIT License – © 2025 Stage One Solutions
-Repo maintained by KevinKickass
+## GitHub Release (per Tag)
+
+```bash
+git tag v0.2.0
+git push origin v0.2.0
+```
+
+Der Workflow `.github/workflows/release.yml` wird automatisch ausgeführt.
+
+---
+
+## Sicherheit
+
+* AES-256-GCM mit 12-Byte IV und 32-Byte Schlüssel
+* Original-Dateiname und MIME-Type verschlüsselt eingebettet
+* Keine Klartext-Metadaten
+* Keine Passwortspeicherung
+
+---
+
+## Lizenz
+
+MIT License – © 2025 [Stage One Solutions](https://stageone.solutions)
+Maintained by [KevinKickass](https://github.com/KevinKickass)
