@@ -14,7 +14,7 @@ Ende-zu-Ende verschlüsselt, zero-trust, plattformübergreifend.
 * AES-256-GCM-Verschlüsselung (E2EE)
 * Datei-Upload mit zufälligem Einmal-Schlüssel
 * Datei-Download per UUID und Key
-* Kompatibel mit der Weboberfläche
+* Kompatibel mit der https://pastezero.de Weboberfläche
 * Plattformübergreifende Binaries (Linux, macOS, Windows)
 * Automatischer GitHub Release bei Tag
 
@@ -27,8 +27,8 @@ Ende-zu-Ende verschlüsselt, zero-trust, plattformübergreifend.
 Siehe [Releases](https://github.com/KevinKickass/pastezero-cli/releases):
 
 ```bash
-curl -LO https://github.com/KevinKickass/pastezero-cli/releases/download/v0.1.1/pastezero-v0.1.1-linux-amd64.tar.gz
-tar -xzf pastezero-v0.1.1-linux-amd64.tar.gz
+curl -LO https://github.com/KevinKickass/pastezero-cli/releases/download/v0.1.3/pastezero-v0.1.3-linux-amd64.tar.gz
+tar -xzf pastezero-v0.1.3-linux-amd64.tar.gz
 chmod +x pastezero
 ./pastezero --help
 ```
