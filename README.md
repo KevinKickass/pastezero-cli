@@ -105,5 +105,5 @@ Der Workflow `.github/workflows/release.yml` wird automatisch ausgeführt.
 
 ## Lizenz
 
-MIT License – © 2025 [Stage One Solutions](https://stageone.solutions)
+GNU General Public License v3.0 – © 2025 [Stage One Solutions](https://stageone.solutions)  
 Maintained by [KevinKickass](https://github.com/KevinKickass)
